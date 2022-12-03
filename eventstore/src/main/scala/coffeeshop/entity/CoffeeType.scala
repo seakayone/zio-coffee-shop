@@ -1,4 +1,4 @@
-package events
+package coffeeshop.entity
 
 sealed trait CoffeeType
 object Espresso  extends CoffeeType

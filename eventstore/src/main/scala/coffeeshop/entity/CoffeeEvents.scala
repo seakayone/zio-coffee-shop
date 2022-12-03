@@ -1,4 +1,4 @@
-package events
+package coffeeshop.entity
 
 import java.time.Instant
 
