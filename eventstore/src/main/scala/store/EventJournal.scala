@@ -4,7 +4,8 @@ import coffeeshop.entity.CoffeeEvent
 import zio.*
 
 case class EventJournal(journalRef: Ref[List[CoffeeEvent]]) {
-  def append(event: CoffeeEvent): UIO[Unit] = journalRef.getAndUpdate(_.prepended(event)).unit
+  def append(event: CoffeeEvent): UIO[Unit] =
+    ZIO.debug(s"Storing ${event}") *> journalRef.getAndUpdate(_.prepended(event)).unit
 
   def lastAppended: UIO[CoffeeEvent] = journalRef.get.map(_.head)
 
