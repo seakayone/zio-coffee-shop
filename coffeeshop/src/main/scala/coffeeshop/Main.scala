@@ -1,6 +1,6 @@
 package coffeeshop
 
-import coffeeshop.api.OrdersApi
+import coffeeshop.api.{OrdersCommandApi, OrdersQueryApi}
 import coffeeshop.domain.{OrdersRepo, OrdersService}
 import store.EventJournal
 import zhttp.service.Server
@@ -13,6 +13,6 @@ object Main extends ZIOAppDefault {
 
   def run = ZIO.logInfo("Starting up") *>
     Server
-      .start(8080, OrdersApi())
+      .start(8080, OrdersCommandApi() ++ OrdersQueryApi())
       .provide(EventJournal.layer, OrdersService.layer, OrdersRepo.layer)
 }
