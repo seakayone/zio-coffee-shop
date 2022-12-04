@@ -2,13 +2,9 @@ package coffeeshop.entity
 
 import zio.ZIO
 
-sealed trait CoffeeType
-
-object Espresso extends CoffeeType
-
-object Americano extends CoffeeType
-
-object FlatWhite extends CoffeeType
+enum CoffeeType {
+  case Espresso, Americano, FlatWhite
+}
 
 object CoffeeType {
   def fromString(t: String): ZIO[Any, String, CoffeeType] = t.toLowerCase match {

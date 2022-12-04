@@ -21,10 +21,10 @@ object OrdersQueryApi {
           .attempt(UUID.fromString(id))
           .flatMap(it => OrdersRepo.findBy(it))
           .map {
-            case Some(order) => Response.text(order.toString)
-            case None        => Response.text("Not found")
+            case Some(order) => Response.json(order.toJson)
+            case None => Response.text("Not found")
           }
       case GET -> !! / "orders" =>
-        OrdersRepo.findAll().map(list => Response.text(list.toString))
+        OrdersRepo.findAll().map(list => Response.json(list.toJson))
     }
 }

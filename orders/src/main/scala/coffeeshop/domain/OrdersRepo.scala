@@ -1,11 +1,17 @@
 package coffeeshop.domain
 
 import coffeeshop.entity.{BeanOrigin, CoffeeType, OrderId}
+import zio.json.{DeriveJsonEncoder, JsonEncoder}
 import zio.{Ref, UIO, ZIO, ZLayer}
 
 import java.time.Instant
 
 case class Order(id: OrderId, orderPlacedAt: Instant, coffeeType: CoffeeType, beanOrigin: BeanOrigin)
+
+object Order {
+  implicit val orderJsonEncoder: JsonEncoder[Order]           = DeriveJsonEncoder.gen[Order]
+  implicit val coffeeTypeJsonEncoder: JsonEncoder[CoffeeType] = DeriveJsonEncoder.gen[CoffeeType]
+}
 
 case class OrdersRepo(orders: Ref[Map[OrderId, Order]]) {
   def save(order: Order): UIO[Unit] = ZIO.debug(s"Saving $order") *> orders.updateAndGet(_ + (order.id -> order)).unit
