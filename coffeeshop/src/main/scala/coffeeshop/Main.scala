@@ -15,9 +15,10 @@ object Main extends ZIOAppDefault {
   val ordersHandlerRegistration: ZIO[EventJournal with OrdersEventHandler, Nothing, UIO[Unit]] = for {
     handler <- ZIO.service[OrdersEventHandler]
     journal <- ZIO.service[EventJournal]
-  } yield journal.subscribe(handler)
-  val apis: Http[OrdersService with OrdersRepo, Throwable, Request, Response] = OrdersCommandApi() ++ OrdersQueryApi()
-  val server: ZIO[OrdersService with OrdersRepo, Throwable, Nothing]          = Server.start(8080, apis)
+    _ <- journal.subscribe(handler)
+  } yield ZIO.unit
+
+  val server: ZIO[OrdersService with OrdersRepo, Throwable, Nothing] = Server.start(8080, OrdersCommandApi() ++ OrdersQueryApi())
 
   val program: ZIO[OrdersService with OrdersRepo with EventJournal with OrdersEventHandler, Throwable, Nothing] =
     ordersHandlerRegistration *> server
