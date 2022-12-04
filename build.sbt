@@ -14,6 +14,7 @@ val deps = Seq(
   "dev.zio" %% "zio-test" % ZioVersion % Test,
   "dev.zio" %% "zio-test-sbt" % ZioVersion % Test
 )
+
 testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
 lazy val barista = (project in file("barista"))
   .settings(libraryDependencies ++= deps)

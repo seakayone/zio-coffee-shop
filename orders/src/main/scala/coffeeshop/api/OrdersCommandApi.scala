@@ -19,13 +19,13 @@ object ApiOrderCommand {
 
 object OrdersCommandApi {
   def apply(): HttpApp[OrdersService, Throwable] =
-    Http.collectZIO[Request] {
-      case req@Method.POST -> !! / "orders" =>
-        req.body.asString
-          .map(_.fromJson[ApiOrderCommand])
-          .flatMap {
-            case Right(order) => OrdersService.placeOrder(order.coffeeType, order.beanOrigin).map(id => Response.text(id.toString))
-            case Left(err) => ZIO.succeed(Response.text(err))
-          }
+    Http.collectZIO[Request] { case req @ Method.POST -> !! / "orders" =>
+      req.body.asString
+        .map(_.fromJson[ApiOrderCommand])
+        .flatMap {
+          case Right(order) =>
+            OrdersService.placeOrder(order.coffeeType, order.beanOrigin).map(id => Response.text(id.toString))
+          case Left(err) => ZIO.succeed(Response.text(err))
+        }
     }
 }

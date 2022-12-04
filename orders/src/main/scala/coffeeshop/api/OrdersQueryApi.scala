@@ -17,11 +17,12 @@ object OrdersQueryApi {
   def apply(): HttpApp[OrdersService & OrdersRepo, Throwable] =
     Http.collectZIO[Request] {
       case GET -> !! / "orders" / id =>
-        ZIO.attempt(UUID.fromString(id))
+        ZIO
+          .attempt(UUID.fromString(id))
           .flatMap(it => OrdersRepo.findBy(it))
           .map {
             case Some(order) => Response.text(order.toString)
-            case None => Response.text("Not found")
+            case None        => Response.text("Not found")
           }
       case GET -> !! / "orders" =>
         OrdersRepo.findAll().map(list => Response.text(list.toString))

@@ -18,7 +18,8 @@ case class OrdersRepo(orders: Ref[Map[OrderId, Order]]) {
 object OrdersRepo {
   def save(order: Order): ZIO[OrdersRepo, Nothing, Unit] = ZIO.service[OrdersRepo].flatMap(_.save(order))
 
-  def findBy(orderId: OrderId): ZIO[OrdersRepo, Nothing, Option[Order]] = ZIO.service[OrdersRepo].flatMap(_.findBy(orderId))
+  def findBy(orderId: OrderId): ZIO[OrdersRepo, Nothing, Option[Order]] =
+    ZIO.service[OrdersRepo].flatMap(_.findBy(orderId))
 
   def findAll(): ZIO[OrdersRepo, Nothing, List[Order]] = ZIO.service[OrdersRepo].flatMap(_.findAll())
 
