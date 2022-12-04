@@ -8,7 +8,7 @@ import java.time.Instant
 case class Order(id: OrderId, orderPlacedAt: Instant, coffeeType: CoffeeType, beanOrigin: BeanOrigin)
 
 case class OrdersRepo(orders: Ref[Map[OrderId, Order]]) {
-  def save(order: Order): UIO[Unit] = orders.updateAndGet(_ + (order.id -> order)).unit
+  def save(order: Order): UIO[Unit] = ZIO.debug(s"Saving $order") *> orders.updateAndGet(_ + (order.id -> order)).unit
 
   def findBy(orderId: OrderId): UIO[Option[Order]] = orders.get.map(_.get(orderId))
 
