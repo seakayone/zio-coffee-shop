@@ -1,5 +1,8 @@
 package coffeeshop
 
+import beans.api.*
+import beans.domain.{BeansCommandService, BeansEventHandler, BeansInventoryRepo, BeansQueryService}
+import coffeeshop.Main.validateEnv
 import coffeeshop.api.{OrdersCommandApi, OrdersQueryApi}
 import coffeeshop.domain.{OrdersEventHandler, OrdersRepo, OrdersService}
 import coffeeshop.store.EventJournal
@@ -12,18 +15,28 @@ object Main extends ZIOAppDefault {
 
   override val bootstrap: ZLayer[Any, Any, Unit] = Runtime.removeDefaultLoggers >>> console(LogFormat.colored)
 
-  val ordersHandlerRegistration: ZIO[EventJournal with OrdersEventHandler, Nothing, UIO[Unit]] = for {
-    handler <- ZIO.service[OrdersEventHandler]
-    journal <- ZIO.service[EventJournal]
-    _       <- journal.subscribe(handler)
+  private val handlerRegistrations = for {
+    journal       <- ZIO.service[EventJournal]
+    ordersHandler <- ZIO.service[OrdersEventHandler]
+    beansHandler  <- ZIO.service[BeansEventHandler]
+    _             <- journal.subscribe(ordersHandler, beansHandler)
   } yield ZIO.unit
 
-  val server: ZIO[OrdersService with OrdersRepo, Throwable, Nothing] =
-    Server.start(8080, OrdersCommandApi() ++ OrdersQueryApi())
+  private val server =
+    Server.start(8080, OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi())
 
-  val program: ZIO[OrdersService with OrdersRepo with EventJournal with OrdersEventHandler, Throwable, Nothing] =
-    ordersHandlerRegistration *> server
+  private val program = handlerRegistrations *> server
 
-  def run =
-    program.provide(OrdersEventHandler.layer, EventJournal.layer, OrdersService.layer, OrdersRepo.layer)
+  def run: ZIO[Any, Throwable, Nothing] =
+    program.provide(
+      ZLayer.fromZIO(ZIO.succeed(Clock.ClockLive)),
+      BeansCommandService.layer,
+      BeansEventHandler.layer,
+      BeansInventoryRepo.layer,
+      BeansQueryService.layer,
+      EventJournal.layer,
+      OrdersEventHandler.layer,
+      OrdersRepo.layer,
+      OrdersService.layer
+    )
 }

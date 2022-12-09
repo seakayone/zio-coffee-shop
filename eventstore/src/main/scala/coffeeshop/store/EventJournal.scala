@@ -8,9 +8,13 @@ trait EventHandler {
 }
 
 case class EventJournal(journalRef: Ref[List[CoffeeEvent]], handlersRef: Ref[Set[EventHandler]]) {
+
+  def appendAll(events: CoffeeEvent*): UIO[Unit] =
+    ZIO.foreachDiscard(events)(event => append(event))
+
   def append(event: CoffeeEvent): UIO[Unit] =
     for {
-      _ <- ZIO.debug(s"Storing ${event}")
+      _ <- ZIO.debug(s"Storing $event")
       _ <- journalRef.update(_.prepended(event))
       _ <- handlersRef.get.flatMap(l => l.foldRight(ZIO.unit)((h, acc) => acc *> h.handle(event)))
     } yield ()
@@ -19,9 +23,9 @@ case class EventJournal(journalRef: Ref[List[CoffeeEvent]], handlersRef: Ref[Set
 
   def size: UIO[Int] = journalRef.get.map(_.size)
 
-  def subscribe(handler: EventHandler): UIO[Unit] =
+  def subscribe(handler: EventHandler*): UIO[Unit] =
     ZIO.debug(s"Subscribing ${handler.getClass.getSimpleName}") *>
-      handlersRef.update(_ + handler).unit
+      ZIO.foreach(handler)(it => handlersRef.update(_ + it)).unit
 }
 
 object EventJournal {
@@ -39,5 +43,6 @@ object EventJournal {
 
   def size: ZIO[EventJournal, Nothing, Int] = ZIO.service[EventJournal].flatMap(_.size)
 
-  def subscribe(handler: EventHandler) = ZIO.service[EventJournal].flatMap(_.subscribe(handler))
+  def subscribe(handler: EventHandler): ZIO[EventJournal, Nothing, Unit] =
+    ZIO.service[EventJournal].flatMap(_.subscribe(handler))
 }

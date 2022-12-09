@@ -6,10 +6,21 @@ import zio.{Ref, UIO, ZIO, ZLayer}
 
 import java.time.Instant
 
-case class Order(id: OrderId, orderPlacedAt: Instant, coffeeType: CoffeeType, beanOrigin: BeanOrigin)
+enum OrderStatus {
+  case PLACED, CANCELED
+}
+
+case class Order(
+  id: OrderId,
+  orderPlacedAt: Instant,
+  coffeeType: CoffeeType,
+  beanOrigin: BeanOrigin,
+  status: OrderStatus
+)
 
 object Order {
   implicit val orderJsonEncoder: JsonEncoder[Order]           = DeriveJsonEncoder.gen[Order]
+  implicit val orderStatus: JsonEncoder[OrderStatus]          = DeriveJsonEncoder.gen[OrderStatus]
   implicit val coffeeTypeJsonEncoder: JsonEncoder[CoffeeType] = DeriveJsonEncoder.gen[CoffeeType]
 }
 
