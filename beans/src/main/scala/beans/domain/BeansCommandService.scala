@@ -1,22 +1,34 @@
 package beans.domain
 
 import eventjournal.entity.*
-import eventjournal.store.EventJournal
+import eventjournal.store.EventPublisher
 import zio.{Clock, Task, UIO, ZIO, ZLayer}
 
-case class BeansCommandService(eventJournal: EventJournal, repo: BeansInventoryRepo, clock: Clock) {
+case class BeansCommandService(publisher: EventPublisher, repo: BeansRepo) {
 
   def storeBeans(beanOrigin: BeanOrigin, amount: Int): UIO[Unit] =
-    clock.instant.flatMap(instant => eventJournal.append(BeansStored(instant, beanOrigin, amount))).unit
+    for {
+      now <- Clock.instant
+      _   <- repo.storeBeans(beanOrigin, amount)
+      _   <- publisher.append(BeansStored(now, beanOrigin, amount))
+    } yield ()
 
   def reserveBeans(beanOrigin: BeanOrigin, orderId: OrderId): UIO[Unit] =
     for {
-      instant <- clock.instant
+      instant <- Clock.instant
       amount  <- repo.getRemaining(beanOrigin)
       _ <- amount match
-             case x if x == 0 => eventJournal.append(OrderFailedBeansNotAvailable(instant, orderId))
-             case _           => eventJournal.appendAll(OrderBeansReserved(instant, orderId), BeansFetched(instant, beanOrigin))
+             case x if x <= 0 => publisher.append(OrderFailedBeansNotAvailable(instant, orderId, beanOrigin))
+             case _           => fetchBeans(beanOrigin, orderId)
     } yield ()
+
+  private def fetchBeans(beanOrigin: BeanOrigin, orderId: OrderId): UIO[Unit] =
+    for {
+      now <- Clock.instant
+      _   <- repo.fetchBeans(beanOrigin, 1)
+      _   <- publisher.appendAll(BeansFetched(now, beanOrigin), OrderBeansReserved(now, orderId))
+    } yield ()
+
 }
 
 object BeansCommandService {
@@ -27,11 +39,10 @@ object BeansCommandService {
   def reserveBeans(beanOrigin: BeanOrigin, orderId: OrderId): ZIO[BeansCommandService, Nothing, Unit] =
     ZIO.service[BeansCommandService].flatMap(_.reserveBeans(beanOrigin, orderId))
 
-  val layer: ZLayer[Clock with BeansInventoryRepo with EventJournal, Nothing, BeansCommandService] = ZLayer.fromZIO {
+  val layer: ZLayer[BeansRepo with EventPublisher, Nothing, BeansCommandService] = ZLayer.fromZIO {
     for {
-      journal <- ZIO.service[EventJournal]
-      repo    <- ZIO.service[BeansInventoryRepo]
-      clock   <- ZIO.service[Clock]
-    } yield BeansCommandService(journal, repo, clock)
+      journal <- ZIO.service[EventPublisher]
+      repo    <- ZIO.service[BeansRepo]
+    } yield BeansCommandService(journal, repo)
   }
 }

@@ -1,26 +1,23 @@
 package beans.domain
 
 import eventjournal.entity.*
-import eventjournal.store.{EventHandler, EventJournal}
+import eventjournal.store.EventHandler
 import zio.{UIO, ZIO, ZLayer}
 
-case class BeansEventHandler(repo: BeansInventoryRepo, commandService: BeansCommandService) extends EventHandler {
+case class BeansEventHandler(commandService: BeansCommandService) extends EventHandler {
   override def handle(event: CoffeeEvent): UIO[Unit] =
     ZIO.log(s"${this.getClass.getSimpleName} received << $event") *>
       (event match {
-        case OrderPlaced(_, orderInfo)           => commandService.reserveBeans(orderInfo.beanOrigin, orderInfo.orderId)
-        case BeansStored(_, beansOrigin, amount) => repo.storeBeans(beansOrigin, amount)
-        case BeansFetched(_, beansOrigin)        => repo.fetchBeans(beansOrigin, 1)
-        case _                                   => ZIO.unit
+        case OrderPlaced(_, orderInfo) => commandService.reserveBeans(orderInfo.beanOrigin, orderInfo.orderId)
+        case _                         => ZIO.unit
       })
 }
 
 object BeansEventHandler {
-  val layer: ZLayer[BeansCommandService with BeansInventoryRepo, Nothing, BeansEventHandler] =
+  val layer: ZLayer[BeansCommandService, Nothing, BeansEventHandler] =
     ZLayer.fromZIO {
       for {
-        repo <- ZIO.service[BeansInventoryRepo]
-        cmd  <- ZIO.service[BeansCommandService]
-      } yield BeansEventHandler(repo, cmd)
+        cmd <- ZIO.service[BeansCommandService]
+      } yield BeansEventHandler(cmd)
     }
 }

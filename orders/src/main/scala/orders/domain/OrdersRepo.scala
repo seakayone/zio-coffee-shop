@@ -7,7 +7,7 @@ import zio.{Ref, UIO, ZIO, ZLayer}
 import java.time.Instant
 
 enum OrderStatus {
-  case PLACED, CANCELED
+  case PLACED, CANCELLED, ACCEPTED, STARTED, FINISHED, DELIVERED
 }
 
 case class Order(

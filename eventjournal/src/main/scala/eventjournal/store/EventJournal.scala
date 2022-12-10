@@ -8,10 +8,16 @@ trait EventHandler {
   def name: String = this.getClass.getSimpleName
 }
 
-case class EventJournal(journalRef: Ref[List[CoffeeEvent]], handlersRef: Ref[Set[EventHandler]]) {
+trait EventPublisher {
+
+  def append(event: CoffeeEvent): UIO[Unit]
 
   def appendAll(events: CoffeeEvent*): UIO[Unit] =
-    ZIO.foreachDiscard(events)(event => append(event))
+    ZIO.foreachDiscard(events)(event => append(event).forkDaemon)
+}
+
+case class EventJournal(journalRef: Ref[List[CoffeeEvent]], handlersRef: Ref[Set[EventHandler]])
+    extends EventPublisher {
 
   def append(event: CoffeeEvent): UIO[Unit] =
     for {
