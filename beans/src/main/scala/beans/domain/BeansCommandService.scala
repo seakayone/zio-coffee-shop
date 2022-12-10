@@ -1,7 +1,7 @@
 package beans.domain
 
-import coffeeshop.entity.*
-import coffeeshop.store.EventJournal
+import eventjournal.entity.*
+import eventjournal.store.EventJournal
 import zio.{Clock, Task, UIO, ZIO, ZLayer}
 
 case class BeansCommandService(eventJournal: EventJournal, repo: BeansInventoryRepo, clock: Clock) {

@@ -1,6 +1,6 @@
-package coffeeshop.store
+package eventjournal.store
 
-import coffeeshop.entity.*
+import eventjournal.entity.*
 import zio.test.*
 import zio.{Ref, UIO, ZIO, ZLayer}
 

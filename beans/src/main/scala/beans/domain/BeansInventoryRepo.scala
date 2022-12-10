@@ -1,11 +1,11 @@
 package beans.domain
 
-import coffeeshop.entity.BeanOrigin
+import eventjournal.entity.BeanOrigin
 import zio.{Ref, UIO, ZIO, ZLayer}
 
 case class BeansInventoryRepo(beansStorage: Ref[Map[BeanOrigin, Int]]) {
 
-  def storeBeans(origin: BeanOrigin, amount: Int): UIO[Unit] = ZIO.debug(s"Storing additional $amount for $origin") *>
+  def storeBeans(origin: BeanOrigin, amount: Int): UIO[Unit] = ZIO.logInfo(s"Storing additional $amount for $origin") *>
     beansStorage
       .getAndUpdate(store =>
         store.get(origin) match {
@@ -15,7 +15,7 @@ case class BeansInventoryRepo(beansStorage: Ref[Map[BeanOrigin, Int]]) {
       )
       .unit
 
-  def fetchBeans(origin: BeanOrigin, amount: Int): UIO[Unit] = ZIO.debug(s"Getting $amount for $origin") *>
+  def fetchBeans(origin: BeanOrigin, amount: Int): UIO[Unit] = ZIO.logInfo(s"Getting $amount for $origin") *>
     beansStorage
       .getAndUpdate(store =>
         store.get(origin) match {
@@ -25,7 +25,7 @@ case class BeansInventoryRepo(beansStorage: Ref[Map[BeanOrigin, Int]]) {
       )
       .unit
 
-  def getRemaining(origin: BeanOrigin): UIO[Int] = ZIO.debug(s"Getting amount for $origin") *>
+  def getRemaining(origin: BeanOrigin): UIO[Int] = ZIO.logInfo(s"Getting amount for $origin") *>
     beansStorage.get.map(_.getOrElse(origin, 0))
 
   def storedBeans: UIO[Map[BeanOrigin, Int]] = beansStorage.get

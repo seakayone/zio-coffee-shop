@@ -1,7 +1,7 @@
 package beans.api
 
 import beans.domain.{BeansCommandService, BeansQueryService}
-import coffeeshop.entity.{BeanOrigin, CoffeeType, OrderId}
+import eventjournal.entity.{BeanOrigin, CoffeeType, OrderId}
 import zhttp.http
 import zhttp.http.*
 import zio.*

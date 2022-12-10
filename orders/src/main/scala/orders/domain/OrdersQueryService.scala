@@ -1,3 +1,3 @@
-package coffeeshop.domain
+package orders.domain
 
 case class OrdersQueryService()

@@ -1,7 +1,7 @@
 package domain
 
-import coffeeshop.entity.{CoffeeEvent, OrderPlaced}
-import coffeeshop.store.EventHandler
+import eventjournal.entity.{CoffeeEvent, OrderPlaced}
+import eventjournal.store.EventHandler
 import zio.{UIO, ZIO}
 
 case class BaristaService() {

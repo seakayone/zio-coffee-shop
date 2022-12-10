@@ -1,8 +1,8 @@
 package beans.api
 
 import beans.domain.BeansCommandService
-import coffeeshop.entity.{BeanOrigin, BeansStored, CoffeeType, OrderId}
-import coffeeshop.store.EventJournal
+import eventjournal.entity.{BeanOrigin, BeansStored, CoffeeType, OrderId}
+import eventjournal.store.EventJournal
 import zhttp.http
 import zhttp.http.*
 import zio.*

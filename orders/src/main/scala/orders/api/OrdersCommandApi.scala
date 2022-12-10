@@ -1,7 +1,7 @@
-package coffeeshop.api
+package orders.api
 
-import coffeeshop.domain.{OrdersRepo, OrdersCommandService}
-import coffeeshop.entity.{BeanOrigin, CoffeeType, OrderId}
+import eventjournal.entity.{BeanOrigin, CoffeeType, OrderId}
+import orders.domain.{OrdersCommandService, OrdersRepo}
 import zhttp.http
 import zhttp.http.*
 import zhttp.http.HttpError.BadRequest

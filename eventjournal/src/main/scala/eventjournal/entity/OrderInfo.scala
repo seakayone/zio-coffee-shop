@@ -1,4 +1,4 @@
-package coffeeshop.entity
+package eventjournal.entity
 
 import java.util.UUID
 

@@ -1,11 +1,11 @@
-package coffeeshop
+package eventjournal
 
 import beans.api.*
 import beans.domain.{BeansCommandService, BeansEventHandler, BeansInventoryRepo, BeansQueryService}
-import coffeeshop.Main.validateEnv
-import coffeeshop.api.{OrdersCommandApi, OrdersQueryApi}
-import coffeeshop.domain.{OrdersEventHandler, OrdersRepo, OrdersCommandService}
-import coffeeshop.store.EventJournal
+import eventjournal.Main.validateEnv
+import eventjournal.store.EventJournal
+import orders.api.{OrdersCommandApi, OrdersQueryApi}
+import orders.domain.{OrdersCommandService, OrdersEventHandler, OrdersRepo}
 import zhttp.http.{Http, Request, Response}
 import zhttp.service.Server
 import zio.*

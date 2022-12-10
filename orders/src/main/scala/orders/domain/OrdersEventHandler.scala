@@ -1,14 +1,14 @@
-package coffeeshop.domain
+package orders.domain
 
-import coffeeshop.domain.OrdersRepo
-import coffeeshop.entity.{CoffeeEvent, OrderCancelled, OrderFailedBeansNotAvailable, OrderPlaced}
-import coffeeshop.store.{EventHandler, EventJournal}
+import eventjournal.entity.*
+import eventjournal.store.*
+import orders.domain.*
+import zio.*
 import zio.Clock.*
-import zio.{Clock, UIO, ULayer, ZIO, ZLayer}
 
 case class OrdersEventHandler(repo: OrdersRepo, commandService: OrdersCommandService) extends EventHandler {
   override def handle(event: CoffeeEvent): UIO[Unit] =
-    ZIO.debug(s"OrdersEventHandler received << $event") *> {
+    ZIO.logInfo(s"OrdersEventHandler received << $event") *> {
       event match {
         case OrderPlaced(instant, orderInfo) =>
           repo.save(Order(orderInfo.orderId, instant, orderInfo.coffeeType, orderInfo.beanOrigin, OrderStatus.PLACED))

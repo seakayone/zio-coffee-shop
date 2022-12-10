@@ -1,7 +1,7 @@
-package coffeeshop.domain
+package orders.domain
 
-import coffeeshop.entity.*
-import coffeeshop.store.EventJournal
+import eventjournal.entity.*
+import eventjournal.store.EventJournal
 import zio.*
 
 import java.time.Instant

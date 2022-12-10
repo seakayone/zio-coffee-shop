@@ -1,6 +1,6 @@
-package coffeeshop.domain
+package orders.domain
 
-import coffeeshop.entity.{BeanOrigin, CoffeeType, OrderId}
+import eventjournal.entity.{BeanOrigin, CoffeeType, OrderId}
 import zio.json.{DeriveJsonEncoder, JsonEncoder}
 import zio.{Ref, UIO, ZIO, ZLayer}
 
@@ -26,7 +26,7 @@ object Order {
 
 case class OrdersRepo(orders: Ref[Map[OrderId, Order]]) {
   def save(order: Order): UIO[Unit] =
-    ZIO.debug(s"OrdersRepo saving $order") *> orders.updateAndGet(_ + (order.id -> order)).unit
+    ZIO.logInfo(s"OrdersRepo saving $order") *> orders.updateAndGet(_ + (order.id -> order)).unit
 
   def findBy(orderId: OrderId): UIO[Option[Order]] = orders.get.map(_.get(orderId))
 

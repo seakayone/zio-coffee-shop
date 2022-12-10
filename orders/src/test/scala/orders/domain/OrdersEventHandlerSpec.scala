@@ -1,7 +1,7 @@
-package coffeeshop.domain
+package orders.domain
 
-import coffeeshop.entity.*
-import coffeeshop.store.EventJournal
+import eventjournal.entity.*
+import eventjournal.store.EventJournal
 import zio.test.*
 import zio.{Clock, ZIO, ZLayer}
 
@@ -13,7 +13,7 @@ object OrdersEventHandlerSpec extends ZIOSpecDefault {
       now     <- Clock.instant
       event    = OrderPlaced(now, OrderInfo(UUID.randomUUID(), CoffeeType.Espresso, "Blue Mountain"))
       _       <- journal.append(event)
-      
+
     } yield assertTrue(false)
   }).provide(OrdersEventHandler.layer, OrdersRepo.layer, EventJournal.layer)
 }

@@ -1,6 +1,6 @@
 package beans.domain
 
-import coffeeshop.entity.BeanOrigin
+import eventjournal.entity.BeanOrigin
 import zio.{Ref, UIO, ZIO, ZLayer}
 
 case class BeansQueryService(repo: BeansInventoryRepo) {
