@@ -1,9 +1,10 @@
 package coffeeshop.api
 
-import coffeeshop.domain.{OrdersRepo, OrdersService}
+import coffeeshop.domain.{OrdersRepo, OrdersCommandService}
 import coffeeshop.entity.{BeanOrigin, CoffeeType, OrderId}
 import zhttp.http
 import zhttp.http.*
+import zhttp.http.HttpError.BadRequest
 import zio.*
 import zio.json.*
 import zio.json.internal.RetractReader
@@ -24,16 +25,16 @@ object OrderPlacedResponse {
 }
 
 object OrdersCommandApi {
-  def apply(): HttpApp[OrdersService, Throwable] =
+  def apply(): HttpApp[OrdersCommandService, Throwable] =
     Http.collectZIO[Request] { case req @ Method.POST -> !! / "orders" =>
       req.body.asString
         .map(_.fromJson[OrderApiCommand])
         .flatMap {
           case Right(order) =>
-            OrdersService
-              .placeOrder(order.coffeeType, order.beanOrigin)
-              .map(OrderPlacedResponse(_))
-              .map(id => Response.json(id.toJson))
+            for {
+              coffeeType <- CoffeeType.fromString(order.coffeeType).mapError(BadRequest(_))
+              id         <- OrdersCommandService.placeOrder(coffeeType, order.beanOrigin)
+            } yield Response.json(OrderPlacedResponse(id).toJson)
           case Left(err) => ZIO.succeed(Response.text(err))
         }
     }

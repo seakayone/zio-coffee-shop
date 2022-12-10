@@ -1,6 +1,6 @@
 package coffeeshop.api
 
-import coffeeshop.domain.{OrdersRepo, OrdersService}
+import coffeeshop.domain.{OrdersRepo, OrdersCommandService}
 import coffeeshop.entity.{BeanOrigin, CoffeeType}
 import zhttp.http
 import zhttp.http.*
@@ -14,7 +14,7 @@ import scala.util.Try
 
 object OrdersQueryApi {
 
-  def apply(): HttpApp[OrdersService & OrdersRepo, Throwable] =
+  def apply(): HttpApp[OrdersCommandService & OrdersRepo, Throwable] =
     Http.collectZIO[Request] {
       case GET -> !! / "orders" / id =>
         ZIO

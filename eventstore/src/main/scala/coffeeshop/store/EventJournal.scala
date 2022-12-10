@@ -14,7 +14,7 @@ case class EventJournal(journalRef: Ref[List[CoffeeEvent]], handlersRef: Ref[Set
 
   def append(event: CoffeeEvent): UIO[Unit] =
     for {
-      _ <- ZIO.debug(s"Storing $event")
+      _ <- ZIO.debug(s"EventJournal appending << $event")
       _ <- journalRef.update(_.prepended(event))
       _ <- handlersRef.get.flatMap(l => l.foldRight(ZIO.unit)((h, acc) => acc *> h.handle(event)))
     } yield ()

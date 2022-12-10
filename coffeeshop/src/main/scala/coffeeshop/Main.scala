@@ -4,7 +4,7 @@ import beans.api.*
 import beans.domain.{BeansCommandService, BeansEventHandler, BeansInventoryRepo, BeansQueryService}
 import coffeeshop.Main.validateEnv
 import coffeeshop.api.{OrdersCommandApi, OrdersQueryApi}
-import coffeeshop.domain.{OrdersEventHandler, OrdersRepo, OrdersService}
+import coffeeshop.domain.{OrdersEventHandler, OrdersRepo, OrdersCommandService}
 import coffeeshop.store.EventJournal
 import zhttp.http.{Http, Request, Response}
 import zhttp.service.Server
@@ -37,6 +37,6 @@ object Main extends ZIOAppDefault {
       EventJournal.layer,
       OrdersEventHandler.layer,
       OrdersRepo.layer,
-      OrdersService.layer
+      OrdersCommandService.layer
     )
 }

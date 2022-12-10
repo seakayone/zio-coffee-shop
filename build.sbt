@@ -11,6 +11,7 @@ val deps = Seq(
   "io.d11"  %% "zhttp"        % ZioHttpVersion,
   "dev.zio" %% "zio-json"     % ZioJsonVersion,
   "dev.zio" %% "zio-logging"  % ZioLoggingVersion,
+  "dev.zio" %% "zio-prelude"  % ZioHttpVersion,
   "dev.zio" %% "zio-test"     % ZioVersion % Test,
   "dev.zio" %% "zio-test-sbt" % ZioVersion % Test
 )
