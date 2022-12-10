@@ -13,7 +13,6 @@ object OrdersEventHandlerSpec extends ZIOSpecDefault {
       now     <- Clock.instant
       event    = OrderPlaced(now, OrderInfo(UUID.randomUUID(), CoffeeType.Espresso, "Blue Mountain"))
       _       <- journal.append(event)
-
     } yield assertTrue(false)
   }).provide(OrdersEventHandler.layer, OrdersRepo.layer, EventJournal.layer)
 }

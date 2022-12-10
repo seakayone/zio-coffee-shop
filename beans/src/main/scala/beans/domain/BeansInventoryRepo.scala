@@ -25,8 +25,7 @@ case class BeansInventoryRepo(beansStorage: Ref[Map[BeanOrigin, Int]]) {
       )
       .unit
 
-  def getRemaining(origin: BeanOrigin): UIO[Int] = ZIO.logInfo(s"Getting amount for $origin") *>
-    beansStorage.get.map(_.getOrElse(origin, 0))
+  def getRemaining(origin: BeanOrigin): UIO[Int] = beansStorage.get.map(_.getOrElse(origin, 0))
 
   def storedBeans: UIO[Map[BeanOrigin, Int]] = beansStorage.get
 }

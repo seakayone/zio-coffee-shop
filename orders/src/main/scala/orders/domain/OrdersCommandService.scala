@@ -19,7 +19,6 @@ case class OrdersCommandService(journal: EventJournal) {
 
   def cancelOrder(orderId: OrderId, reason: String): UIO[Unit] =
     Clock.instant.flatMap(now => journal.append(OrderCancelled(now, orderId, reason)))
-
 }
 
 object OrdersCommandService {

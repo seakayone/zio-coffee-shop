@@ -15,14 +15,15 @@ case class EventJournal(journalRef: Ref[List[CoffeeEvent]], handlersRef: Ref[Set
 
   def append(event: CoffeeEvent): UIO[Unit] =
     for {
-      _ <- ZIO.logInfo(s"EventJournal appending << $event")
-      _ <- journalRef.update(_.prepended(event))
-      _ <- handlersRef.get.flatMap(l => l.foldRight(ZIO.unit)((h, acc) => acc *> h.handle(event)))
+      _        <- ZIO.logInfo(s"EventJournal appending << $event")
+      _        <- journalRef.update(_.prepended(event))
+      handlers <- handlersRef.get
+      _        <- ZIO.foreachDiscard(handlers)(handler => handler.handle(event))
     } yield ()
 
   def lastAppended: UIO[CoffeeEvent] = journalRef.get.map(_.head)
 
-  def listAll: UIO[List[CoffeeEvent]] = journalRef.get
+  def listAll: UIO[List[CoffeeEvent]] = journalRef.get.map(_.reverse)
 
   def size: UIO[Int] = journalRef.get.map(_.size)
 

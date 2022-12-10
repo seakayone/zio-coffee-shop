@@ -3,6 +3,7 @@ package eventjournal
 import beans.api.*
 import beans.domain.{BeansCommandService, BeansEventHandler, BeansInventoryRepo, BeansQueryService}
 import eventjournal.Main.validateEnv
+import eventjournal.api.EventJournalApi
 import eventjournal.store.EventJournal
 import orders.api.{OrdersCommandApi, OrdersQueryApi}
 import orders.domain.{OrdersCommandService, OrdersEventHandler, OrdersRepo}
@@ -23,7 +24,10 @@ object Main extends ZIOAppDefault {
   } yield ZIO.unit
 
   private val server =
-    Server.start(8080, OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi())
+    Server.start(
+      8080,
+      OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi() ++ EventJournalApi()
+    )
 
   private val program = handlerRegistrations *> server
 

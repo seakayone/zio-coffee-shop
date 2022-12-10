@@ -34,7 +34,7 @@ object OrdersCommandApi {
             for {
               coffeeType <- CoffeeType.fromString(order.coffeeType).mapError(BadRequest(_))
               id         <- OrdersCommandService.placeOrder(coffeeType, order.beanOrigin)
-            } yield Response.json(OrderPlacedResponse(id).toJson)
+            } yield Response.json(OrderPlacedResponse(id).toJson).setStatus(Status.Accepted)
           case Left(err) => ZIO.succeed(Response.text(err))
         }
     }
