@@ -2,8 +2,8 @@ package beans.api
 
 import beans.domain.BeansCommandService
 import eventjournal.entity.{BeanOrigin, BeansStored, CoffeeType, OrderId}
-import zhttp.http
-import zhttp.http.*
+import zio.http.*
+import zio.http.model.*
 import zio.*
 import zio.json.*
 import zio.json.internal.RetractReader

@@ -1,7 +1,8 @@
 package eventjournal.api
 
 import eventjournal.store.EventJournal
-import zhttp.http.*
+import zio.http.*
+import zio.http.model.*
 
 object EventJournalApi {
   def apply() =

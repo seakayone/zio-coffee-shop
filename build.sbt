@@ -3,14 +3,12 @@ name                     := "zio-coffee-shop"
 
 val ZioVersion        = "2.0.6"
 val ZioJsonVersion    = "0.4.2"
-val ZHttpVersion      = "2.0.0-RC11"
 val ZioHttpVersion    = "0.0.3"
 val ZioLoggingVersion = "2.1.8"
 val ZioPreludeVersion = "1.0.0-RC16"
 
 val deps = Seq(
   "dev.zio" %% "zio"          % ZioVersion,
-  "io.d11"  %% "zhttp"        % ZHttpVersion,
   "dev.zio" %% "zio-http"     % ZioHttpVersion,
   "dev.zio" %% "zio-json"     % ZioJsonVersion,
   "dev.zio" %% "zio-logging"  % ZioLoggingVersion,

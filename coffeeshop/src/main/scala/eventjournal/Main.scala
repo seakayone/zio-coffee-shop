@@ -9,9 +9,9 @@ import eventjournal.api.EventJournalApi
 import eventjournal.store.EventJournal
 import orders.api.{OrdersCommandApi, OrdersQueryApi}
 import orders.domain.{OrdersCommandService, OrdersEventHandler, OrdersRepo}
-import zhttp.http.{Http, Request, Response}
-import zhttp.service.Server
 import zio.*
+import zio.http.*
+import zio.http.model.*
 import zio.logging.{LogFormat, console}
 
 object Main extends ZIOAppDefault {
@@ -26,11 +26,18 @@ object Main extends ZIOAppDefault {
     _              <- journal.subscribe(ordersHandler, beansHandler, baristaHandler)
   } yield ZIO.unit
 
+  private val errorCallback: Throwable => ZIO[Any, Nothing, Unit] =
+    e => ZIO.logError(e.getMessage)
+
   private val server =
-    Server.start(
-      8080,
-      OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi() ++ EventJournalApi() ++ BaristaQueryApi()
+    Server.serve(
+      OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi() ++ EventJournalApi() ++ BaristaQueryApi(),
+      Some(errorCallback)
     )
+
+  private object HttpServer {
+    val layer: ZLayer[Any, Throwable, Server] = ServerConfig.live >>> Server.live
+  }
 
   private val program = handlerRegistrations *> server
 
@@ -44,6 +51,7 @@ object Main extends ZIOAppDefault {
       BeansRepo.layer,
       BeansQueryService.layer,
       EventJournal.layer,
+      HttpServer.layer,
       OrdersEventHandler.layer,
       OrdersRepo.layer,
       OrdersCommandService.layer

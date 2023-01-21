@@ -2,9 +2,8 @@ package orders.api
 
 import eventjournal.entity.{BeanOrigin, CoffeeType}
 import orders.domain.{OrdersCommandService, OrdersRepo}
-import zhttp.http
-import zhttp.http.*
-import zhttp.http.Method.GET
+import zio.http.*
+import zio.http.model.*
 import zio.*
 import zio.json.*
 import zio.json.internal.RetractReader
@@ -16,7 +15,7 @@ object OrdersQueryApi {
 
   def apply(): HttpApp[OrdersCommandService & OrdersRepo, Throwable] =
     Http.collectZIO[Request] {
-      case GET -> !! / "orders" / id =>
+      case Method.GET -> !! / "orders" / id =>
         ZIO
           .attempt(UUID.fromString(id))
           .flatMap(it => OrdersRepo.findBy(it))
@@ -24,7 +23,7 @@ object OrdersQueryApi {
             case Some(order) => Response.json(order.toJson)
             case None        => Response.text("Not found")
           }
-      case GET -> !! / "orders" =>
+      case Method.GET -> !! / "orders" =>
         OrdersRepo.findAll().map(list => Response.json(list.toJson))
     }
 }
