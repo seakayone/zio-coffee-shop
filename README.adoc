@@ -1,11 +1,10 @@
 = Introduction
 
-[mermaid, target=some-graph, format=png]
---
-graph TD
-    A[Christmas] -->|Get money| B(Go shopping)
-    B --> C{Let me think}
-    C -->|One| D[Laptop]
-    C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
---
+CQRS and event source implementation of a "distributed coffe-shop" using Scala/ZIO.
+
+
+Example inspired by similar approaches:
+* AWS - https://github.com/aws-samples/designing-cloud-native-microservices-on-aws
+* Java - https://github.com/sdaschner/scalable-coffee-shop
+* .NET - https://github.com/thangchung/coffeeshop-modular
+* Go - https://github.com/thangchung/go-coffeeshop
