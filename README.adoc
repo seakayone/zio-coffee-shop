@@ -7,6 +7,7 @@ CQRS and event source implementation of a distributed coffee-shop using Scala/ZI
 
 
 Example inspired by similar approaches:
+
 * AWS - https://github.com/aws-samples/designing-cloud-native-microservices-on-aws
 * Java - https://github.com/sdaschner/scalable-coffee-shop
 * .NET - https://github.com/thangchung/coffeeshop-modular
