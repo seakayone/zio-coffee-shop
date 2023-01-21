@@ -1,10 +1,6 @@
 == Introduction
 
-[#img-build-job,link=https://github.com/seakayone/zio-coffee-shop/actions/workflows/scala.yml]
-image:https://github.com/seakayone/zio-coffee-shop/actions/workflows/scala.yml/badge.svg[Build Job]
-
-[#img-license,link=http://www.apache.org/licenses/LICENSE-2.0.txt]
-image:http://img.shields.io/:license-Apache%202-red.svg[License]
+image:https://github.com/seakayone/zio-coffee-shop/actions/workflows/scala.yml/badge.svg[Build Job] image:http://img.shields.io/:license-Apache%202-red.svg[License]
 
 
 CQRS and event source implementation of a distributed coffee-shop using Scala/ZIO.
