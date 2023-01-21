@@ -1,6 +1,9 @@
-= Introduction
 
-CQRS and event source implementation of a "distributed coffe-shop" using Scala/ZIO.
+image::https://github.com/seakayone/zio-coffee-shop/actions/workflows/scala.yml/badge.svg[]
+
+== Introduction
+
+CQRS and event source implementation of a distributed coffee-shop using Scala/ZIO.
 
 
 Example inspired by similar approaches:
