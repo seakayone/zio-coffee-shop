@@ -1,7 +1,7 @@
 ThisBuild / scalaVersion := "3.2.1"
 name                     := "zio-coffee-shop"
 
-val ZioVersion        = "2.0.5"
+val ZioVersion        = "2.0.6"
 val ZioJsonVersion    = "0.4.2"
 val ZHttpVersion      = "2.0.0-RC11"
 val ZioHttpVersion    = "0.0.3"
