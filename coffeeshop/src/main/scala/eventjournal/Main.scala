@@ -13,7 +13,9 @@ import zio.*
 import zio.http.*
 import zio.http.model.*
 import zio.logging.{LogFormat, console}
-
+import zio.metrics.connectors.prometheus.PrometheusPublisher
+import zio.metrics.connectors.{MetricsConfig, prometheus}
+import zio.metrics.jvm.DefaultJvmMetrics
 object Main extends ZIOAppDefault {
 
   override val bootstrap: ZLayer[Any, Any, Unit] = Runtime.removeDefaultLoggers >>> console(LogFormat.colored)
@@ -29,9 +31,17 @@ object Main extends ZIOAppDefault {
   private val errorCallback: Throwable => ZIO[Any, Nothing, Unit] =
     e => ZIO.logError(e.getMessage)
 
+  object MetricsApi {
+    def apply(): HttpApp[PrometheusPublisher, Nothing] =
+      Http
+        .collectZIO[Request] { case Method.GET -> !! / "metrics" =>
+          ZIO.serviceWithZIO[PrometheusPublisher](_.get.map(Response.text))
+        }
+  }
+
   private val server =
     Server.serve(
-      OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi() ++ EventJournalApi() ++ BaristaQueryApi(),
+      MetricsApi() ++ OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi() ++ EventJournalApi() ++ BaristaQueryApi(),
       Some(errorCallback)
     )
 
@@ -54,6 +64,11 @@ object Main extends ZIOAppDefault {
       HttpServer.layer,
       OrdersEventHandler.layer,
       OrdersRepo.layer,
-      OrdersCommandService.layer
+      OrdersCommandService.layer,
+      /// metrics
+      ZLayer.succeed(MetricsConfig(5.seconds)),
+      prometheus.publisherLayer,
+      prometheus.prometheusLayer,
+      DefaultJvmMetrics.live.unit
     )
 }

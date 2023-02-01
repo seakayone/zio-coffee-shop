@@ -6,15 +6,17 @@ val ZioJsonVersion    = "0.4.2"
 val ZioHttpVersion    = "0.0.3"
 val ZioLoggingVersion = "2.1.8"
 val ZioPreludeVersion = "1.0.0-RC16"
+val ZioMetricsConnectorsVersion = "2.0.5"
 
 val deps = Seq(
-  "dev.zio" %% "zio"          % ZioVersion,
-  "dev.zio" %% "zio-http"     % ZioHttpVersion,
-  "dev.zio" %% "zio-json"     % ZioJsonVersion,
-  "dev.zio" %% "zio-logging"  % ZioLoggingVersion,
-  "dev.zio" %% "zio-prelude"  % ZioPreludeVersion,
-  "dev.zio" %% "zio-test"     % ZioVersion % Test,
-  "dev.zio" %% "zio-test-sbt" % ZioVersion % Test
+  "dev.zio" %% "zio"                    % ZioVersion,
+  "dev.zio" %% "zio-http"               % ZioHttpVersion,
+  "dev.zio" %% "zio-json"               % ZioJsonVersion,
+  "dev.zio" %% "zio-logging"            % ZioLoggingVersion,
+  "dev.zio" %% "zio-prelude"            % ZioPreludeVersion,
+  "dev.zio" %% "zio-metrics-connectors" % ZioMetricsConnectorsVersion,
+  "dev.zio" %% "zio-test"               % ZioVersion % Test,
+  "dev.zio" %% "zio-test-sbt"           % ZioVersion % Test
 )
 
 testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
