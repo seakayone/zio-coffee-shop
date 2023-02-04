@@ -1,10 +1,12 @@
-package eventjournal
+package coffeeshop.main
 
 import barista.api.BaristaQueryApi
 import barista.domain.{BaristaCommandService, BaristaEventHandler, BaristaRepo}
 import beans.api.*
 import beans.domain.{BeansCommandService, BeansEventHandler, BeansQueryService, BeansRepo}
-import eventjournal.Main.validateEnv
+import coffeeshop.infrastructure.HandlerRegistrations
+import coffeeshop.main.Main.validateEnv
+import coffeeshop.web.{MetricsApi, WebServer}
 import eventjournal.api.EventJournalApi
 import eventjournal.store.EventJournal
 import orders.api.{OrdersCommandApi, OrdersQueryApi}
@@ -21,46 +23,22 @@ object Main extends ZIOAppDefault {
 
   override val bootstrap: ZLayer[Any, Any, Unit] = Runtime.removeDefaultLoggers >>> console(LogFormat.colored)
 
-  private val handlerRegistrations = for {
-    journal        <- ZIO.service[EventJournal]
-    ordersHandler  <- ZIO.service[OrdersEventHandler]
-    beansHandler   <- ZIO.service[BeansEventHandler]
-    baristaHandler <- ZIO.service[BaristaEventHandler]
-    _              <- journal.subscribe(ordersHandler, beansHandler, baristaHandler)
-  } yield ZIO.unit
-
-  private val errorCallback: Throwable => ZIO[Any, Nothing, Unit] =
-    e => ZIO.logError(e.getMessage)
-
-  object MetricsApi {
-    def apply(): App[PrometheusPublisher] =
-      Http
-        .collectZIO[Request] { case Method.GET -> !! / "metrics" =>
-          ZIO.serviceWithZIO[PrometheusPublisher](_.get.map(Response.text))
-        }
-  }
-
-  val apis =
-    (MetricsApi() ++ OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi() ++ EventJournalApi() ++ BaristaQueryApi())
-      .mapError(_ => Response.status(Status.InternalServerError))
-
-  private object HttpServer {
-    val layer: ZLayer[Any, Throwable, Server] = ServerConfig.live >>> Server.live
-  }
-
-  private val program = handlerRegistrations *> Server.serve(apis, Some(errorCallback))
+  private val program = HandlerRegistrations.make *> WebServer.make
 
   def run: ZIO[Any, Throwable, Nothing] =
     program.provide(
+      // events
+      EventJournal.layer,
+      // barista
       BaristaEventHandler.layer,
       BaristaRepo.layer,
       BaristaCommandService.layer,
+      // beans
       BeansCommandService.layer,
       BeansEventHandler.layer,
       BeansRepo.layer,
       BeansQueryService.layer,
-      EventJournal.layer,
-      HttpServer.layer,
+      // orders
       OrdersEventHandler.layer,
       OrdersRepo.layer,
       OrdersCommandService.layer,
@@ -68,6 +46,8 @@ object Main extends ZIOAppDefault {
       ZLayer.succeed(MetricsConfig(5.seconds)),
       prometheus.publisherLayer,
       prometheus.prometheusLayer,
-      DefaultJvmMetrics.live.unit
+      DefaultJvmMetrics.live.unit,
+      // HTTP
+      ServerConfig.live >>> Server.live
     )
 }
