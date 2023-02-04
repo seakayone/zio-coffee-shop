@@ -16,6 +16,7 @@ import zio.logging.{LogFormat, console}
 import zio.metrics.connectors.prometheus.PrometheusPublisher
 import zio.metrics.connectors.{MetricsConfig, prometheus}
 import zio.metrics.jvm.DefaultJvmMetrics
+
 object Main extends ZIOAppDefault {
 
   override val bootstrap: ZLayer[Any, Any, Unit] = Runtime.removeDefaultLoggers >>> console(LogFormat.colored)
@@ -32,24 +33,22 @@ object Main extends ZIOAppDefault {
     e => ZIO.logError(e.getMessage)
 
   object MetricsApi {
-    def apply(): HttpApp[PrometheusPublisher, Nothing] =
+    def apply(): App[PrometheusPublisher] =
       Http
         .collectZIO[Request] { case Method.GET -> !! / "metrics" =>
           ZIO.serviceWithZIO[PrometheusPublisher](_.get.map(Response.text))
         }
   }
 
-  private val server =
-    Server.serve(
-      MetricsApi() ++ OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi() ++ EventJournalApi() ++ BaristaQueryApi(),
-      Some(errorCallback)
-    )
+  val apis =
+    (MetricsApi() ++ OrdersCommandApi() ++ OrdersQueryApi() ++ BeansQueryApi() ++ BeansCommandApi() ++ EventJournalApi() ++ BaristaQueryApi())
+      .mapError(_ => Response.status(Status.InternalServerError))
 
   private object HttpServer {
     val layer: ZLayer[Any, Throwable, Server] = ServerConfig.live >>> Server.live
   }
 
-  private val program = handlerRegistrations *> server
+  private val program = handlerRegistrations *> Server.serve(apis, Some(errorCallback))
 
   def run: ZIO[Any, Throwable, Nothing] =
     program.provide(

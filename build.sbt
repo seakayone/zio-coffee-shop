@@ -3,7 +3,7 @@ name                     := "zio-coffee-shop"
 
 val ZioVersion        = "2.0.6"
 val ZioJsonVersion    = "0.4.2"
-val ZioHttpVersion    = "0.0.3"
+val ZioHttpVersion    = "0.0.4"
 val ZioLoggingVersion = "2.1.8"
 val ZioPreludeVersion = "1.0.0-RC16"
 val ZioMetricsConnectorsVersion = "2.0.5"

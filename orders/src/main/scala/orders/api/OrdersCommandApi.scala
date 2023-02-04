@@ -2,9 +2,9 @@ package orders.api
 
 import eventjournal.entity.{BeanOrigin, CoffeeType, OrderId}
 import orders.domain.{OrdersCommandService, OrdersRepo}
+import zio.*
 import zio.http.*
 import zio.http.model.*
-import zio.*
 import zio.http.model.HttpError.BadRequest
 import zio.json.*
 import zio.json.internal.RetractReader
